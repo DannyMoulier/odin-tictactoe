@@ -31,36 +31,41 @@ const gameBoard = (function () {
   return { createBoard, checkWin };
 })();
 
-function player(name, id) {
+function player(name, id, mark, playingAgainst) {
   let score = 0;
   const getScore = () => score;
   const addScore = () => score++;
-  return { name, getScore, addScore, id };
+  return { name, getScore, addScore, id, mark, playingAgainst };
 }
 
 function game() {
   const board = gameBoard.createBoard();
   console.log(board);
 
-  const player1 = player(prompt('player one name?'), 1);
+  const player1 = player(prompt('player one name?'), 1, 'X', 'O');
   console.log(player1);
 
-  const player2 = player(prompt('player two name?'), 2);
+  const player2 = player(prompt('player two name?'), 2, 'O', 'X');
   console.log(player2);
 
-  for (let i = 0; i < 5; i++) {
-    const indexForX = prompt(`${player1.name}, where to put the X?`);
-    board.splice(indexForX, 1, 'X');
-    console.log(board);
-    if (gameBoard.checkWin('X', board, 'O')) {
-      console.log(`${player1.name} wins!`);
-    }
+  let currentTurn = player2;
 
-    const indexForO = prompt(`${player2.name}, where to put the O?`);
-    board.splice(indexForO, 1, 'O');
+  for (let i = 0; i < 9; i++) {
+    currentTurn = currentTurn === player1 ? player2 : player1;
+    console.log(currentTurn);
+    const indexForMark = prompt(`${currentTurn.name}, where to put the ${currentTurn.mark}?`);
+    board.splice(indexForMark, 1, currentTurn.mark);
     console.log(board);
-    if (gameBoard.checkWin('O', board, 'X')) {
-      console.log(`${player2.name} wins!`);
+    console.log(i);
+    if (gameBoard.checkWin(currentTurn.mark, board, currentTurn.playingAgainst)) {
+      console.log(`${currentTurn.name} wins! point given!`);
+      currentTurn.addScore();
+      console.log(`${player1.name} score: ${player1.getScore()}`);
+      console.log(`${player2.name} score: ${player2.getScore()}`);
+      break;
+    }
+    if (i === 9) {
+      console.log('tie');
     }
   }
 }
