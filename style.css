@@ -1,3 +1,26 @@
 :root {
   color-scheme: dark;
 }
+
+.main-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.main-board {
+  display: grid;
+  grid-template-columns: 160px 160px 160px;
+  grid-template-rows: 160px 160px 160px;
+}
+
+.main-board > button {
+  border: solid white 5px;
+  background-color: transparent;
+  text-align: inherit;
+  font: inherit;
+  border-radius: 0;
+  appearance: none;
+  cursor: pointer;
+}
