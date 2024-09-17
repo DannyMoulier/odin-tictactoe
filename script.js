@@ -49,42 +49,49 @@ function gameController() {
   const player1 = player('Player 1', 1, 'X', 'O');
   const player2 = player('player 2', 2, 'O', 'X');
 
-  let currentTurn = player2;
+  let currentTurn = player1;
 
   const switchActivePlayer = () =>
     (currentTurn = currentTurn === player1 ? player2 : player1);
 
   const getActivePlayer = () => currentTurn;
 
+  const getBoard = () => board;
+  const isCellEmpty = (cellId) => board[cellId] === ' ';
+
   const playRound = (activePlayer, cellId) => {
     board.splice(cellId, 1, activePlayer.mark);
-    if (
-      gameBoard.checkWin(activePlayer.mark, board, activePlayer.playingAgainst)
-    ) {
+    let win = gameBoard.checkWin(
+      activePlayer.mark,
+      board,
+      activePlayer.playingAgainst
+    );
+    if (win) {
       activePlayer.addScore();
     }
+    switchActivePlayer();
+    return { win, updatedBoard: board };
   };
 
-  return { getActivePlayer, playRound, switchActivePlayer };
+  return {
+    getActivePlayer,
+    playRound,
+    switchActivePlayer,
+    getBoard,
+    isCellEmpty,
+  };
 }
 
 function displayController() {
   const game = gameController();
 
   const mainBoard = document.querySelector('.main-board');
-  // const mainTurn = document.querySelector('.main-turn');
 
   let board = gameBoard.createBoard();
-  console.log(board);
   let cellCount = 0;
 
   for (let x of board) {
-    // try reading the array with the symbols on it, abd then displaying it in the DOM.
-    //this code should be used as a refresh dome, clicking the cell
     const cell = document.createElement('button');
-    if (x === 'X') {
-      console.log(cellCount);
-    }
     cell.classList.add(`main-board-cell`);
     cell.id = cellCount;
     cell.innerText = ' ';
@@ -92,29 +99,28 @@ function displayController() {
     cellCount++;
   }
 
-  // read the dom, so now i a can put this in a function and in a for loop
   const currentBoardDom = document.querySelectorAll('.main-board-cell');
+  const infoScreen = document.querySelector('.main-info');
   let turn = 0;
 
   currentBoardDom.forEach((cell) => {
     cell.addEventListener('click', () => {
       const activePlayer = game.getActivePlayer();
-      console.log(`clicked on cell: ` + cell.id);
-      cell.innerText = activePlayer.mark;
 
-      const currentBoardDom = document.querySelectorAll('.main-board-cell');
-      const array = Array.from(currentBoardDom);
-      board = array.map((x) => x.textContent);
-      console.log(board);
+      if (!game.isCellEmpty(cell.id)) {
+        return;
+      }
 
-      game.playRound(activePlayer, cell.id);
+      const result = game.playRound(activePlayer, cell.id);
 
-      game.switchActivePlayer();
-      turn++;
+      const updatedBoard = result.updatedBoard;
+      updatedBoard.forEach((mark, index) => {
+        currentBoardDom[index].innerText = mark;
+      });
 
-      console.log(
-        'score: ' + activePlayer.getScore() + ' ' + activePlayer.name
-      );
+      if (result.win) {
+        infoScreen.innerText = `${activePlayer.name} wins!`;
+      }
     });
   });
 }
