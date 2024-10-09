@@ -41,21 +41,22 @@ function player(name, id, mark, playingAgainst) {
   let score = 0;
   const getScore = () => score;
   const addScore = () => score++;
-  return { name, getScore, addScore, id, mark, playingAgainst };
+  const zeroScore = () => (score = 0);
+  return { name, getScore, addScore, id, mark, playingAgainst, zeroScore };
 }
 
 function gameController() {
-  const board = gameBoard.createBoard();
   const player1 = player('Player 1', 1, 'X', 'O');
   const player2 = player('player 2', 2, 'O', 'X');
 
+  let board = gameBoard.createBoard();
   let currentTurn = player1;
+  let round = 0;
 
   const switchActivePlayer = () =>
     (currentTurn = currentTurn === player1 ? player2 : player1);
 
   const getActivePlayer = () => currentTurn;
-
   const getBoard = () => board;
   const isCellEmpty = (cellId) => board[cellId] === ' ';
 
@@ -66,11 +67,33 @@ function gameController() {
       board,
       activePlayer.playingAgainst
     );
+    round++;
+    switchActivePlayer();
+    let tie = false;
     if (win) {
       activePlayer.addScore();
+      currentTurn = player1;
+    } else if (round === 9) {
+      tie = true;
+      round = 0;
+      currentTurn = player1;
     }
-    switchActivePlayer();
-    return { win, updatedBoard: board };
+
+    return { win, updatedBoard: board, tie };
+  };
+
+  const resetBoard = () => {
+    board = gameBoard.createBoard();
+    round = 0;
+    return board;
+  };
+
+  const getPlayer1 = () => player1;
+  const getPlayer2 = () => player2;
+
+  const endGame = () => {
+    player1.zeroScore();
+    player2.zeroScore();
   };
 
   return {
@@ -79,52 +102,124 @@ function gameController() {
     switchActivePlayer,
     getBoard,
     isCellEmpty,
+    resetBoard,
+    getPlayer1,
+    getPlayer2,
+    endGame,
   };
 }
 
 function displayController() {
   const game = gameController();
 
-  const mainBoard = document.querySelector('.main-board');
+  const resetGameDisplay = () => {
+    mainBoard.innerHTML = '';
+    const board = game.resetBoard();
 
-  let board = gameBoard.createBoard();
-  let cellCount = 0;
+    let cellCount = 0;
+    for (let x of board) {
+      const cell = document.createElement('button');
+      cell.classList.add(`main-board-cell`);
+      cell.id = cellCount;
+      cell.innerText = ' ';
+      mainBoard.appendChild(cell);
+      cellCount++;
+    }
 
-  for (let x of board) {
-    const cell = document.createElement('button');
-    cell.classList.add(`main-board-cell`);
-    cell.id = cellCount;
-    cell.innerText = ' ';
-    mainBoard.appendChild(cell);
-    cellCount++;
-  }
+    updateScores();
 
-  const currentBoardDom = document.querySelectorAll('.main-board-cell');
-  const infoScreen = document.querySelector('.main-info');
-  let turn = 0;
+    resetBoardListener();
+  };
 
-  currentBoardDom.forEach((cell) => {
-    cell.addEventListener('click', () => {
-      const activePlayer = game.getActivePlayer();
+  const updateScores = () => {
+    player1Score.innerText = `player 1 score: ${game.getPlayer1().getScore()}`;
+    player2Score.innerText = `player 2 score: ${game.getPlayer2().getScore()}`;
+  };
 
-      if (!game.isCellEmpty(cell.id)) {
-        return;
-      }
+  let mainBoard = document.querySelector('.main-board');
+  const player1Score = document.querySelector('.main-players-player1');
+  const player2Score = document.querySelector('.main-players-player2');
 
-      const result = game.playRound(activePlayer, cell.id);
+  const endGameDialog = document.querySelector('.end-game-modal');
+  const endGameInfo = document.querySelector('.end-game-dialog-box-text');
+  const quitButton = document.querySelector(
+    '.end-game-dialog-box-controls-quit'
+  );
+  const continueButton = document.querySelector(
+    '.end-game-dialog-box-controls-continue'
+  );
 
-      const updatedBoard = result.updatedBoard;
-      updatedBoard.forEach((mark, index) => {
-        currentBoardDom[index].innerText = mark;
+  const startGameDialog = document.querySelector('.start-game-modal');
+  const startGameButton = document.querySelector(
+    '.end-game-dialog-box-controls-start'
+  );
+
+  const resetBoardListener = () => {
+    const currentBoardDom = document.querySelectorAll('.main-board-cell');
+
+    currentBoardDom.forEach((cell) => {
+      cell.addEventListener('click', () => {
+        const activePlayer = game.getActivePlayer();
+
+        if (!game.isCellEmpty(cell.id)) {
+          return;
+        }
+
+        let result = game.playRound(activePlayer, cell.id);
+        const updatedBoard = result.updatedBoard;
+
+        updatedBoard.forEach((mark, index) => {
+          currentBoardDom[index].innerText = mark;
+        });
+
+        if (result.win) {
+          currentBoardDom.forEach((cell) => {
+            cell.disabled = true;
+          });
+
+          endGameInfo.innerText = `${activePlayer.name} wins!`;
+
+          setTimeout(() => {
+            endGameDialog.showModal();
+          }, 1000);
+        } else if (result.tie) {
+          currentBoardDom.forEach((cell) => {
+            cell.disabled = true;
+          });
+
+          endGameInfo.innerText = `its a tie!`;
+
+          setTimeout(() => {
+            endGameDialog.showModal();
+          }, 1000);
+        }
+
+        updateScores();
       });
-
-      if (result.win) {
-        infoScreen.innerText = `${activePlayer.name} wins!`;
-      }
     });
+  };
+
+  startGameDialog.showModal();
+  startGameButton.addEventListener('click', () => {
+    resetGameDisplay();
+    startGameDialog.close();
+  });
+
+  quitButton.addEventListener('click', () => {
+    game.endGame();
+    updateScores();
+    mainBoard.innerHTML = '';
+    player1Score.innerHTML = '';
+    player2Score.innerHTML = '';
+
+    endGameDialog.close();
+    startGameDialog.showModal();
+  });
+
+  continueButton.addEventListener('click', () => {
+    endGameDialog.close();
+    resetGameDisplay();
   });
 }
 
 displayController();
-
-// game();

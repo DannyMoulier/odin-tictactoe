@@ -24,4 +24,7 @@
   border-radius: 0;
   appearance: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
