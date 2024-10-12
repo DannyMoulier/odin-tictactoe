@@ -46,11 +46,28 @@ function player(name, id, mark, playingAgainst) {
 }
 
 function gameController() {
-  const player1 = player('Player 1', 1, 'X', 'O');
-  const player2 = player('player 2', 2, 'O', 'X');
+  // const player1 = player('Player 1', 1, 'X', 'O');
+  // const player2 = player('player 2', 2, 'O', 'X');
+
+  let player1;
+  let player2;
+  let currentTurn;
+
+  const createPlayers = (p1SignChoice) => {
+    let playingAgainst;
+    if (p1SignChoice === 'X') {
+      playingAgainst = 'O';
+    } else {
+      playingAgainst = 'X';
+    }
+    player1 = player('player 1', 1, p1SignChoice, playingAgainst);
+    player2 = player('player 2', 1, playingAgainst, p1SignChoice);
+    currentTurn = player1.mark === 'X' ? player1 : player2;
+  };
 
   let board = gameBoard.createBoard();
-  let currentTurn = player1;
+  // let currentTurn = player1;
+
   let round = 0;
 
   const switchActivePlayer = () =>
@@ -72,11 +89,11 @@ function gameController() {
     let tie = false;
     if (win) {
       activePlayer.addScore();
-      currentTurn = player1;
+      currentTurn = player1.mark === 'X' ? player1 : player2;
     } else if (round === 9) {
       tie = true;
       round = 0;
-      currentTurn = player1;
+      currentTurn = player1.mark === 'X' ? player1 : player2;
     }
 
     return { win, updatedBoard: board, tie };
@@ -97,6 +114,7 @@ function gameController() {
   };
 
   return {
+    createPlayers,
     getActivePlayer,
     playRound,
     switchActivePlayer,
@@ -151,7 +169,7 @@ function displayController() {
 
   const startGameDialog = document.querySelector('.start-game-modal');
   const startGameButton = document.querySelector(
-    '.end-game-dialog-box-controls-start'
+    '.start-game-dialog-box-controls-start'
   );
 
   const resetBoardListener = () => {
@@ -201,6 +219,15 @@ function displayController() {
 
   startGameDialog.showModal();
   startGameButton.addEventListener('click', () => {
+    const player1ChoiceX = document.getElementById('X');
+    const player1ChoiceO = document.getElementById('O');
+
+    if (player1ChoiceO.checked === true) {
+      game.createPlayers('O');
+    } else if (player1ChoiceX.checked === true) {
+      game.createPlayers('X');
+    }
+
     resetGameDisplay();
     startGameDialog.close();
   });
