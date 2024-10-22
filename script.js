@@ -17,7 +17,7 @@ const gameBoard = (function () {
     let cleanBoard = currentBoard.map((element) =>
       element === markToRemove ? ' ' : element
     );
-
+    let macthedScenario;
     for (let scenario of winningScenarios) {
       let count = 0;
       for (let index of scenario) {
@@ -27,28 +27,34 @@ const gameBoard = (function () {
       }
       if (count === 3) {
         win = true;
+        macthedScenario = scenario;
         break;
       }
     }
-
-    return win;
+    return { win, macthedScenario };
   };
 
   return { createBoard, checkWin };
 })();
 
-function player(name, id, mark, playingAgainst) {
+function player(color, name, id, mark, playingAgainst) {
   let score = 0;
   const getScore = () => score;
   const addScore = () => score++;
   const zeroScore = () => (score = 0);
-  return { name, getScore, addScore, id, mark, playingAgainst, zeroScore };
+  return {
+    color,
+    name,
+    getScore,
+    addScore,
+    id,
+    mark,
+    playingAgainst,
+    zeroScore,
+  };
 }
 
 function gameController() {
-  // const player1 = player('Player 1', 1, 'X', 'O');
-  // const player2 = player('player 2', 2, 'O', 'X');
-
   let player1;
   let player2;
   let currentTurn;
@@ -60,8 +66,8 @@ function gameController() {
     } else {
       playingAgainst = 'X';
     }
-    player1 = player('player 1', 1, p1SignChoice, playingAgainst);
-    player2 = player('player 2', 1, playingAgainst, p1SignChoice);
+    player1 = player('#705cf2', 'Player 1', 1, p1SignChoice, playingAgainst);
+    player2 = player('#3bbf8f', 'Player 2', 1, playingAgainst, p1SignChoice);
     currentTurn = player1.mark === 'X' ? player1 : player2;
   };
 
@@ -79,14 +85,21 @@ function gameController() {
 
   const playRound = (activePlayer, cellId) => {
     board.splice(cellId, 1, activePlayer.mark);
-    let win = gameBoard.checkWin(
+    let results = gameBoard.checkWin(
       activePlayer.mark,
       board,
       activePlayer.playingAgainst
     );
+
+    let win = results.win;
+    let scenario = results.macthedScenario;
+
     round++;
+
     switchActivePlayer();
+
     let tie = false;
+
     if (win) {
       activePlayer.addScore();
       currentTurn = player1.mark === 'X' ? player1 : player2;
@@ -96,7 +109,7 @@ function gameController() {
       currentTurn = player1.mark === 'X' ? player1 : player2;
     }
 
-    return { win, updatedBoard: board, tie };
+    return { win, updatedBoard: board, tie, scenario };
   };
 
   const resetBoard = () => {
@@ -150,8 +163,10 @@ function displayController() {
   };
 
   const updateScores = () => {
-    player1Score.innerText = `player 1 score: ${game.getPlayer1().getScore()}`;
-    player2Score.innerText = `player 2 score: ${game.getPlayer2().getScore()}`;
+    player1Score.innerText = `Player 1: ${game.getPlayer1().getScore()}`;
+    player1Score.style.backgroundColor = '#705cf2';
+    player2Score.innerText = `Player 2: ${game.getPlayer2().getScore()}`;
+    player2Score.style.backgroundColor = '#3bbf8f';
   };
 
   let mainBoard = document.querySelector('.main-board');
@@ -193,6 +208,9 @@ function displayController() {
         if (result.win) {
           currentBoardDom.forEach((cell) => {
             cell.disabled = true;
+            if (result.scenario.includes(Number(cell.id))) {
+              cell.style.backgroundColor = activePlayer.color;
+            }
           });
 
           endGameInfo.innerText = `${activePlayer.name} wins!`;
@@ -238,6 +256,8 @@ function displayController() {
     mainBoard.innerHTML = '';
     player1Score.innerHTML = '';
     player2Score.innerHTML = '';
+    player1Score.style.backgroundColor = '';
+    player2Score.style.backgroundColor = '';
 
     endGameDialog.close();
     startGameDialog.showModal();

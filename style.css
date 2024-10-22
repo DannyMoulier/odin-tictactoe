@@ -1,5 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Abel&display=swap');
+
+@font-face {
+  font-family: XOfont;
+  src: url(./xoicons/fonts/icomoon.ttf);
+}
+
 :root {
   color-scheme: dark;
+  --color-base-background: #262626;
+  --color-window-background: #2c2c2c;
+  --color-border-background: #3c3c3c;
+  --color-choice-button: #4a4a4a;
+  --color-choice-border: #535353;
+  --color-base-text: #d9d3d9;
+  --color-base-1: #d96055;
+  --color-base-2: #3bbf8f;
+  --color-base-3: #705cf2;
+  --color-base-3-highlighted: #8373eb;
+  --color-base-4: #4a30f2;
+}
+
+body {
+  background-color: var(--color-base-background);
+  color: var(--color-base-text);
+  font-family: 'abel', 'roboto', sans-serif;
 }
 
 .main-container {
@@ -10,15 +35,75 @@
   flex-direction: column;
 }
 
+.main-players {
+  margin-top: 64px;
+  display: flex;
+  gap: 64px;
+}
+
+.main-players > div {
+  height: 32px;
+  width: 160px;
+  border-radius: 3px;
+}
+
+.main-players-player1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-players-player2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-base-background);
+  font-weight: 600;
+}
+
+.game-logo {
+  font-family: 'XOfont', sans-serif;
+  font-size: 3rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 32px;
+}
+
+.game-logo #x1 {
+  color: var(--color-base-3);
+}
+
+.game-logo #x2 {
+  color: var(--color-base-2);
+}
+
+.game-logo #o1 {
+  color: var(--color-base-3);
+}
+
+.game-logo #o2 {
+  color: var(--color-base-2);
+}
+
 .main-board {
   display: grid;
   grid-template-columns: 160px 160px 160px;
   grid-template-rows: 160px 160px 160px;
+  gap: 8px;
+  font-family: 'XOfont';
+  font-size: 3rem;
+}
+
+.main-board > button:hover {
+  background-color: var(--color-border-background);
 }
 
 .main-board > button {
-  border: solid white 5px;
-  background-color: transparent;
+  border: solid var(--color-border-background) 1.6px;
+  background-color: var(--color-window-background);
   text-align: inherit;
   font: inherit;
   border-radius: 0;
@@ -27,4 +112,104 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 3px;
+  transition: background-color 300ms;
+}
+
+.start-game-modal[open] {
+  border: solid var(--color-border-background) 1.6px;
+  background-color: var(--color-window-background);
+
+  width: 420px;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.start-game-modal[open] button:hover {
+  background-color: var(--color-base-3-highlighted);
+}
+
+.game-logo-row {
+  display: flex;
+}
+
+.start-game-dialog-box-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.start-game-dialog-box-controls-start {
+  background-color: var(--color-base-3);
+  width: 100%;
+  height: 48px;
+  border-radius: 3px;
+  font-size: 1.6rem;
+}
+
+.start-game-dialog-box-text input[type='radio'] {
+  display: none;
+}
+
+.start-game-dialog-box-text input[type='radio']:checked + label {
+  background-color: var(--color-base-3);
+}
+
+.start-game-dialog-box-text input[type='radio']:checked + label:hover {
+  background-color: var(--color-base-3-highlighted);
+}
+
+.start-game-dialog-box-text label {
+  position: relative;
+  font-size: 1.6rem;
+  font-family: 'XOfont', sans-serif;
+  padding: 10px 50px;
+  border-radius: 3px;
+  transition: background-color 300ms;
+  border: solid 2px var(--color-choice-border);
+  background-color: var(--color-choice-button);
+  cursor: pointer;
+}
+
+.start-game-dialog-box-text form {
+  display: flex;
+  gap: 32px;
+}
+
+.end-game-modal[open] {
+  border: solid var(--color-border-background) 1.6px;
+  background-color: var(--color-window-background);
+
+  width: 210px;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+
+.end-game-dialog-box-text {
+  font-size: 2rem;
+}
+
+.end-game-dialog-box-controls {
+  display: flex;
+  gap: 24px;
+  font-size: 1.3rem;
+}
+
+.end-game-dialog-box-controls button {
+  background-color: var(--color-base-3);
+  padding-block: 4px;
+  padding-inline: 20px;
+  border-radius: 3px;
+}
+
+.end-game-dialog-box-controls button:hover {
+  background-color: var(--color-base-3-highlighted);
 }

@@ -6,6 +6,7 @@
     <title>Document</title>
     <script type="text/javascript" src="script.js" defer></script>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="reset.css" />
   </head>
   <body>
     <div class="main-container">
@@ -30,16 +31,26 @@
     </div>
     <div class="start-game-dialog-box">
       <dialog class="start-game-modal" id="start-game-modal">
+        <div class="game-logo">
+          <div class="game-logo-row" id="1">
+            <div class="game-logo-icon" id="x1">X</div>
+            <div class="game-logo-icon" id="o2">O</div>
+          </div>
+          <div class="game-logo-row" id="2">
+            <div class="game-logo-icon" id="o1">O</div>
+            <div class="game-logo-icon" id="x2">X</div>
+          </div>
+        </div>
         <div class="start-game-dialog-box-text">
-          <p>Choose player 1's sign</p>
+          <p>CHOOSE PLAYERS 1's SIGN</p>
           <form >
             <input type="radio" id="X" name="player1-choice" value="X" checked="checked">
             <label for="X">X</label>
             <input type="radio" id="O" name="player1-choice" value="O">
             <label for="O">O</label>
           </form> 
-          <button type="submit" class="start-game-dialog-box-controls-start">start game</button>
-          <p>REMEMBER: X goes first</p>
+          <p>REMEMBER: X GOES FIRST</p>
+          <button type="submit" class="start-game-dialog-box-controls-start">START GAME</button>
         </div>
         <div class="start-game-dialog-box-controls">
     </div>
